@@ -1,0 +1,10 @@
+// Naive recursive Fibonacci -- the classic benchmark.
+// Run it natively:   python -m tinyjit run examples/fib.tj -e fib 30
+// See its machine code: python -m tinyjit dump examples/fib.tj
+
+fn fib(n) {
+    if (n < 2) {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}

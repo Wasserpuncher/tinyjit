@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tinyjit"
+version = "1.0.0"
+description = "A JIT compiler in pure Python that emits and runs real x86-64 machine code"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["jit", "compiler", "x86-64", "machine-code", "codegen", "zero-dependency"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Compilers",
+    "Topic :: Software Development :: Interpreters",
+    "Operating System :: POSIX :: Linux",
+]
+# No dependencies: everything comes from the Python standard library.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Wasserpuncher/tinyjit"
+Issues = "https://github.com/Wasserpuncher/tinyjit/issues"
+
+[project.scripts]
+tinyjit = "tinyjit.cli:main"
+
+[tool.setuptools]
+packages = ["tinyjit"]

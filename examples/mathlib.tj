@@ -1,0 +1,78 @@
+// A small library showing loops, recursion, multiple functions calling
+// each other, and every operator the language has.
+//
+//   python -m tinyjit run examples/mathlib.tj -e gcd 1071 462   -> 21
+//   python -m tinyjit run examples/mathlib.tj -e is_prime 97    -> 1
+//   python -m tinyjit run examples/mathlib.tj -e isqrt 1000000  -> 1000
+
+fn gcd(a, b) {
+    while (b != 0) {
+        let t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+fn lcm(a, b) {
+    return a / gcd(a, b) * b;
+}
+
+// Integer square root by binary search.
+fn isqrt(n) {
+    if (n < 2) {
+        return n;
+    }
+    let lo = 1;
+    let hi = n;
+    while (lo <= hi) {
+        let mid = lo + (hi - lo) / 2;
+        if (mid <= n / mid) {
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return hi;
+}
+
+fn is_prime(n) {
+    if (n < 2) {
+        return 0;
+    }
+    let d = 2;
+    while (d * d <= n) {
+        if (n % d == 0) {
+            return 0;
+        }
+        d = d + 1;
+    }
+    return 1;
+}
+
+// Count primes below n, exercising a call inside a loop.
+fn count_primes(n) {
+    let count = 0;
+    let i = 2;
+    while (i < n) {
+        if (is_prime(i)) {
+            count = count + 1;
+        }
+        i = i + 1;
+    }
+    return count;
+}
+
+// Number of Collatz steps to reach 1. Shows && and mixed arithmetic.
+fn collatz(n) {
+    let steps = 0;
+    while (n != 1 && n > 0) {
+        if (n % 2 == 0) {
+            n = n / 2;
+        } else {
+            n = 3 * n + 1;
+        }
+        steps = steps + 1;
+    }
+    return steps;
+}
