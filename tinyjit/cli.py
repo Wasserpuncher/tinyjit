@@ -59,32 +59,48 @@ def _hex_dump(data: bytes, base: int) -> None:
         print(f"  {base + row:08x}  {hex_bytes}")
 
 
-def main(argv: list[str] | None = None) -> int:
+def _run_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="tinyjit",
-        description="A JIT compiler that turns a small language into x86-64 machine code.",
+        prog="tinyjit run", description="compile a program and call one of its functions"
     )
-    sub = parser.add_subparsers(dest="command", required=True)
-
-    run_parser = sub.add_parser("run", help="compile a program and call one of its functions")
-    run_parser.add_argument("file")
-    run_parser.add_argument("-e", "--entry", default="main", help="function to call (default: main)")
-    run_parser.add_argument("args", nargs="*", type=int, help="integer arguments")
-    run_parser.add_argument(
+    parser.add_argument("file")
+    parser.add_argument("-e", "--entry", default="main", help="function to call (default: main)")
+    parser.add_argument(
         "--interp", action="store_true",
         help="evaluate with the reference interpreter instead of native code",
     )
+    parser.add_argument("args", nargs="*", type=int, help="integer arguments")
+    return parser
 
-    dump_parser = sub.add_parser("dump", help="show the generated machine code")
-    dump_parser.add_argument("file")
 
-    args = parser.parse_args(argv)
+def _dump_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="tinyjit dump", description="show the generated machine code")
+    parser.add_argument("file")
+    return parser
+
+
+_USAGE = "usage: tinyjit {run,dump} ...\n  run FILE [-e ENTRY] [--interp] [ARGS...]\n  dump FILE"
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+
+    if not argv or argv[0] in ("-h", "--help"):
+        print(_USAGE)
+        return 0 if argv else 2
+
+    command, rest = argv[0], argv[1:]
 
     try:
-        if args.command == "run":
-            return run(args.file, args.entry, args.args, args.interp)
-        if args.command == "dump":
-            return dump(args.file)
+        if command == "run":
+            # parse_intermixed_args reliably matches a variable-length positional
+            # (the integer arguments) even when it follows the -e/--interp
+            # options. Plain parse_args does not, on Python < 3.12.
+            namespace = _run_parser().parse_intermixed_args(rest)
+            return run(namespace.file, namespace.entry, namespace.args, namespace.interp)
+        if command == "dump":
+            namespace = _dump_parser().parse_args(rest)
+            return dump(namespace.file)
     except FileNotFoundError as exc:
         print(f"tinyjit: no such file: {exc.filename}", file=sys.stderr)
         return 1
@@ -92,6 +108,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"tinyjit: {exc}", file=sys.stderr)
         return 1
 
+    print(f"tinyjit: unknown command {command!r}\n{_USAGE}", file=sys.stderr)
     return 2
 
 
