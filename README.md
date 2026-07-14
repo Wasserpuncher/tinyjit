@@ -128,6 +128,7 @@ unlikely to share a bug.
 Requires Python 3.10+ on an **x86-64** machine running Linux or Intel macOS.
 There is nothing to install:
 
+<!-- readme-check: skip=clones-this-repo-into-itself -->
 ```console
 $ git clone https://github.com/Wasserpuncher/tinyjit && cd tinyjit
 
