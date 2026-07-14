@@ -33,3 +33,11 @@ jobs:
         run: |
           test "$(python -m tinyjit run examples/fib.tj -e fib 30)" = "832040"
           test "$(python -m tinyjit run examples/mathlib.tj -e gcd 1071 462)" = "21"
+
+      # The console blocks on the front page are run, and the numbers in them
+      # are compared against what the commands actually print. A README that
+      # quietly stops being true fails the build here.
+      - name: The README must still tell the truth
+        run: |
+          pip install git+https://github.com/Wasserpuncher/readme-check
+          readme-check README.md --no-color
